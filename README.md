@@ -15,6 +15,8 @@ Negation: ~(Some boolean value). Works like the ! operator.
 BinaryOperator: all booleans that have a operator that takes two operants, e.g. A AND B.
 The operators provided here are AND, OR, IMP, EQ.
 
+Parser: helps to read a well-formatted string into a proposition.
+
 Proposition: As explained on line 6-7 of this .txt file, it helps eliminate naked new/deletes. 
 
 The Boolean classes are linked together in a tree-like matter.

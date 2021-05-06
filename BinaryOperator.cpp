@@ -4,14 +4,8 @@ BinaryOperator::BinaryOperator(std::function<bool(bool, bool)> op, Type t, Boole
 	:Boolean(t), binOp(op), left(l), right(r) {}
 
 BinaryOperator::~BinaryOperator() {
-	if (left) {
-		left->~Boolean();
-		delete left;
-	}
-	if (right) {
-		right->~Boolean();
-		delete right;
-	}
+	delete left;
+	delete right;
 }
 bool BinaryOperator::evaluate(const std::map<std::string, bool>& eval) const {
 	return binOp(left->evaluate(eval), right->evaluate(eval));

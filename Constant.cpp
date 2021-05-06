@@ -3,8 +3,6 @@
 
 Constant::Constant(bool val) :Boolean(Type::CON), value(val) {}
 
-Constant::~Constant() {}
-
 bool Constant::evaluate(const std::map<std::string, bool>& eval) const {
 	return value;
 }

@@ -3,10 +3,7 @@
 Negation::Negation(Boolean* b_) :Boolean(Type::NEG), b(b_) {}
 
 Negation::~Negation() {
-	if (b) {
-		b->~Boolean();
-		delete b;
-	}
+	delete b;
 }
 
 bool Negation::evaluate(const std::map<std::string, bool>& eval) const {

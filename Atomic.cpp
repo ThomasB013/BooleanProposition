@@ -2,8 +2,6 @@
 
 Atomic::Atomic(std::string str) :Boolean(Type::ATOM), id(str) {}
 
-Atomic::~Atomic() {}
-
 bool Atomic::evaluate(const std::map<std::string, bool>& eval) const {
 	std::map<std::string, bool>::const_iterator it = eval.find(id);
 	return (it == eval.end()) ? false : it->second; //return false as default.

@@ -246,13 +246,13 @@ void Satisfiable::display(std::ostream& os, std::istream& is) {
 			<< to_string(start_state) << " can hold.\n"
 			<< "It follows that the following propositions:\n";
 		for (const Proposition& p : start_state.second)
-			os << p << '\n';
+			os << p.to_string() << '\n';
 		if (start_state.first.empty())
 			os << "Are a tautology.\n";
 		else {
 			os << "Are a logical consequence of:\n";
 			for (const Proposition& p : start_state.first)
-				os << p << '\n';
+				os << p.to_string() << '\n';
 		}
 	}
 	else {

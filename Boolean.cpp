@@ -1,5 +1,6 @@
 #include "Boolean.h"
 
+#include <vector>
 
 std::string to_str(Type t) {
 	switch (t) {
@@ -24,3 +25,4 @@ Boolean::~Boolean() {}
 Type Boolean::get_type() const {
 	return type;
 }
+

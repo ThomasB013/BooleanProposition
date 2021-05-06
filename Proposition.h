@@ -1,13 +1,14 @@
 #pragma once
 #include "Boolean.h"
 
-#include <iostream>
-
 class Proposition
 {
 public:
 	//Default constructor: will set the proposition to True
 	Proposition();
+	//From string representation to proposition.
+	Proposition(std::string str);
+	Proposition(const char* c);
 	//Boolean* b constructor: use this with the helper functions.
 	Proposition(Boolean* b);
 	//Copy constructor
@@ -54,9 +55,6 @@ public:
 private:
 	Boolean* b;
 };
-
-//Prints the Proposition p to os, using the toString() representation.
-std::ostream& operator<<(std::ostream& os, const Proposition& p);
 
 //HELPER FUNCTIONS:
 Boolean* Eq(Boolean* l, Boolean* r); //l <-> r 

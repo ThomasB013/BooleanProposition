@@ -5,9 +5,13 @@
 #include "Boolean.h"
 #include "Constant.h"
 #include "BinaryOperator.h"
-
+#include "Parser.h"
 
 Proposition::Proposition() :b(new Constant(true)) {}
+
+Proposition::Proposition(std::string str) : b(parser(&str[0], &str.back() + 1)) {}
+
+Proposition::Proposition(const char* c) :b(parser(c, c + strlen(c))) {}
 
 Proposition::Proposition(Boolean* b_) : b(b_) {}
 
@@ -75,11 +79,6 @@ bool Proposition::operator==(const Proposition& p) const {
 
 bool Proposition::evaluate(const std::map<std::string, bool>& m) const {
 	return b->evaluate(m);
-}
-
-std::ostream& operator<<(std::ostream& os, const Proposition& p) {
-	os << p.to_string();
-	return os;
 }
 
 

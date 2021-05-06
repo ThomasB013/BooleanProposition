@@ -1,6 +1,3 @@
-// BooleanLogicParsing.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
-
 #include <iostream>
 #include <fstream>
 
@@ -14,31 +11,27 @@ int main()
 {
     /*
     Example from la-lecture-05-semantic-tableaux-ho by Engelbert Hubbers (I don't know if my university is copy-righted).
-    
+
     There are three suitcases with the following statements:
     1. This suitcase is empty.
     2. The gold is in suitcase 3.
     3. Both other suitcases are empty.
-
     Furthermore, we know that there is gold in exaclty one suitcase, and on exaclty one suitcase there is a true statement.
-
     Which suitcase contains the gold and which suitcase has the true statement?
     */
 
     //Make propositions for each suitcase:
-    Proposition gold_in_sc1 = Var("G1");
-    Proposition gold_in_sc2 = Var("G2");
-    Proposition gold_in_sc3 = Var("G3");
+ 
 
     //Then these are the following statements:
-    Proposition statement1 = Neg(gold_in_sc1);
-    Proposition statement2 = gold_in_sc3;
-    Proposition statement3 = And(Neg(gold_in_sc1), Neg(gold_in_sc2));
+    Proposition statement1 = "~G1"; 
+    Proposition statement2 = "G3";
+    Proposition statement3 = "~G1/\\~G2"; 
 
     //The gold is in exaclty one suitcase:
-    Proposition gold_in_only_sc1 = And(gold_in_sc1, And(Neg(gold_in_sc2), Neg(gold_in_sc3)));
-    Proposition gold_in_only_sc2 = And(Neg(gold_in_sc1), And(gold_in_sc2, Neg(gold_in_sc3)));
-    Proposition gold_in_only_sc3 = And(Neg(gold_in_sc1), And(Neg(gold_in_sc2), gold_in_sc3));
+    Proposition gold_in_only_sc1 = "G1/\\~G2/\\~G3"; 
+    Proposition gold_in_only_sc2 = "~G1/\\G2/\\~G3";
+    Proposition gold_in_only_sc3 = "~G1/\\~G2/\\G3";
     Proposition gold_in_exactly_one = Or(gold_in_only_sc1, Or(gold_in_only_sc2, gold_in_only_sc3));
 
     //There is only one true statement:
@@ -51,20 +44,20 @@ int main()
     //See example_cmds.txt for the commands that lead to a evaluation.
 
     Satisfiable s({ gold_in_exactly_one, exactly_one_true }, {});
-    
+
     ifstream suit_case_in{ "suitcases.txt" };
 
     s.display(cout, suit_case_in);
     /*
     We get the following output:
-    
+
     If the following atomics are true:
     G2
     And these are false:
     G1, G3
     Then the leftside of 'o' evaluates to true and the rightside evaluates to false:
     G1/\~G2/\~G3\/~G1/\G2/\~G3\/~G1/\~G2/\G3, ~G1/\~G3/\~(~G1/\~G2)\/~~G1/\G3/\~(~G1/\~G2)\/~~G1/\~G3/\~G1/\~G2  o
-  
+
     Hence it follows that the gold is in suitcase 2, and the statement on suitcase 1 is true.
     */
 
@@ -72,15 +65,14 @@ int main()
     The Satisfiable class can also be used to proof that something is not satisfiable.
     Let's say we wanted to proof that (A->B)\/(A->C) <-> A->B\/C.
     */
-    Proposition left = Or(Imp(Var("A"), Var("B")), Imp(Var("A"), Var("C")));
-    Proposition right = Imp(Var("A"), Or(Var("B"), Var("C")));
-    Proposition p = Eq(left, right);
+
+    Proposition p = "(A->B)\\/(A->C)<->A->B\\/C";
 
     //The way to proof that would be to search for an evaluation of A, B and C such that it doesn't hold.
     //If we can't find that, it does hold!
 
     Satisfiable theorem(p);//equivalent to Satisfiable theorem1({ {}, {p} });
-    
+
     //Possible steps are in theorem.txt.
     ifstream theorem_in{ "theorem.txt" };
     theorem.display(cout, theorem_in);
@@ -95,4 +87,3 @@ int main()
     Hence, the theorem holds.
     */
 }
-

@@ -1,7 +1,8 @@
 #include "Parser.h"
 #include "Proposition.h"
+#include <vector>
+#include <stack>
 
-#include <iostream>
 //assume well formatted string.
 std::vector<std::pair<const char*, const char*>> parse_brackets(const char*& begin, const char*& end) {
 	int brack = -1;
@@ -73,7 +74,7 @@ Boolean* parser(const char* begin, const char* end) {
 		else if (*p == '<' && *++p == '-' && *++p == '>' && max <= Type::EQ) {
 			max = Type::EQ;
 			max_p = p; //if we already found an equivalence earlier, we still parse it such that the rightmost gets evaluated as last.
-		} //note that  max_p points to the last character of the operator of the the max Type.
+		} //note that  max_p points to the last elements of the type.
 	}
 	switch (max) {
 	case Type::NEG: return Neg(parser(max_p + 1, end)); //[~FORM]  -> ~[FROM]
@@ -85,5 +86,3 @@ Boolean* parser(const char* begin, const char* end) {
 	}
 	return Var("There is a bug in Parser.cpp");
 }
-
-//CON = 0, ATOM = 0, NEG, AND, OR, IMP, EQ

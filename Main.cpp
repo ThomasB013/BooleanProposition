@@ -1,11 +1,29 @@
 #include <iostream>
 #include <fstream>
 
-#include "Boolean.h"
 #include "Satisfiable.h"
-#include "Proposition.h"
 
 using namespace std;
+
+const char* SEPERATE = "\n\n\n\n**************************************************************************************************\n\n\n\n";
+
+void test() { //Put this in a while loop to see if there are memory leaks.
+    Proposition statement1 = "~G1";
+    Proposition statement2 = "G3";
+    Proposition statement3 = "~G1/\\~G2";
+
+    //The gold is in exaclty one suitcase:
+    Proposition gold_in_only_sc1 = "G1/\\~G2/\\~G3";
+    Proposition gold_in_only_sc2 = "~G1/\\G2/\\~G3";
+    Proposition gold_in_only_sc3 = "~G1/\\~G2/\\G3";
+    Proposition gold_in_exactly_one = Or(gold_in_only_sc1, Or(gold_in_only_sc2, gold_in_only_sc3));
+
+    //There is only one true statement:
+    Proposition only_1_true = And(statement1, And(Neg(statement2), Neg(statement3)));
+    Proposition only_2_true = And(Neg(statement1), And(statement2, Neg(statement3)));
+    Proposition only_3_true = And(Neg(statement1), And(Neg(statement2), statement3));
+    Proposition exactly_one_true = Or(only_1_true, Or(only_2_true, only_3_true));
+}
 
 int main()
 {
@@ -21,7 +39,7 @@ int main()
     */
 
     //Make propositions for each suitcase:
- 
+   
 
     //Then these are the following statements:
     Proposition statement1 = "~G1"; 
@@ -58,8 +76,23 @@ int main()
     Then the leftside of 'o' evaluates to true and the rightside evaluates to false:
     G1/\~G2/\~G3\/~G1/\G2/\~G3\/~G1/\~G2/\G3, ~G1/\~G3/\~(~G1/\~G2)\/~~G1/\G3/\~(~G1/\~G2)\/~~G1/\~G3/\~G1/\~G2  o
 
-    Hence it follows that the gold is in suitcase 2, and the statement on suitcase 1 is true.
+    Hence it follows that the gold is in suitcase 2.
+
+    We can also see which statement is true now:
     */
+    map<string, bool> m;
+    m.insert({ "G1", false });
+    m.insert({ "G2", true });
+    m.insert({ "G3", false });
+    if (statement1.evaluate(m))
+        cout << "\nThe statement on suitcase 1 is correct\n";
+    if (statement2.evaluate(m))
+        cout << "\nThe statement on suitcase 2 is correct\n";
+    if (statement3.evaluate(m))
+        cout << "\nThe statement on suitcase 3 is correct\n";
+    
+    // Only "The statement on suitcase 1 is correct" is printed to the console
+
 
     /*
     The Satisfiable class can also be used to proof that something is not satisfiable.
@@ -75,6 +108,9 @@ int main()
 
     //Possible steps are in theorem.txt.
     ifstream theorem_in{ "theorem.txt" };
+    
+    cout << SEPERATE;
+    
     theorem.display(cout, theorem_in);
 
     /*

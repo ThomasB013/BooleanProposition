@@ -25,10 +25,12 @@ std::vector<std::pair<const char*, const char*>> parse_brackets(const char*& beg
 }
 
 //Checks if p is in between or on ( ) given in brackets.
-bool is_in(std::vector<std::pair<const char*, const char*>>& brackets, const char* p) {
+bool skip_brackets(std::vector<std::pair<const char*, const char*>>& brackets, const char* p) {
 	for (const auto& pair : brackets)
-		if (pair.first <= p && p <= pair.second)
+		if (pair.first <= p && p <= pair.second) {
+			p = pair.second;
 			return true;
+		}
 	return false;
 }
 
@@ -51,12 +53,7 @@ Boolean* parser(const char* begin, const char* end) {
 	const char* max_p = begin;
 	
 	for (const char* p = begin; p != end; ++p) {
-		if (is_in(brackets, p)) { //needed to prevent it from checking beyoned end. End may very well point to another operator.
-			while (is_in(brackets, p))
-				++p;
-			--p; //So that the ++p at the end of the loop points to one place after the closing bracket.
-			//yes, this could be done in the is_in function, but that would be very hidden.
-		}
+		if (skip_brackets(brackets, p));
 		else if (*p == '~' && max < Type::NEG) {
 			max = Type::NEG;
 			max_p = p;

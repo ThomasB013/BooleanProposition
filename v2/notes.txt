@@ -1,0 +1,52 @@
+/*
+Version 1:
+<formula>           ::= <equivalence>
+<equivalence>       ::= <implication>   | <equivalence> <equivalencesymbol> <implication>
+<implication>       ::= <disjunction>   | <disjunction> <implicationsymbol> <implication>
+<disjunction>       ::= <conjunction>   | <conjunction> <orsymbol> <disjunction>
+<conjunction>       ::= <negation>      | <negation> <andsymbol> <conjunction>
+<negation>          ::= <value>    | <notsymbol> <negation>
+<value>             ::= <ident>         | ( <formula> )
+
+<ident>             ::= [_ + letter] [_ + letter + ' + digit]*
+<letter>            ::= [a-z + A-Z]
+<equivalencesymbol> ::= <->
+<implicationsymbol> ::= ->
+<orsymbol>          ::= \/
+<andsymbol>         ::= /\
+<notsymbol>         ::= ~
+*/
+
+/*
+Version 2:
+<formula>           ::= <equivalence>
+<equivalence>       ::= <implication>   | <equivalence> <-> <implication>
+<implication>       ::= <disjunction>   | <disjunction> -> <implication>
+<disjunction>       ::= <conjunction>   | <conjunction> \/ <disjunction>
+<conjunction>       ::= <negation>      | <negation> /\ <conjunction>
+<negation>          ::= <value>    | ~ <negation>
+<value>             ::= <ident>         | ( <formula> )
+
+<ident>             ::= [_ + letter] [_ + letter + ' + digit]*
+<letter>            ::= [a-z + A-Z]
+<digit>             ::= [0-9]
+
+Version 2 is reduced enough.
+*/
+
+/*
+Smaller example:
+exp = sum
+sum = sum + mul | sum - mul | mul   OR:    mul + sum | mul - sum | mul. Does it matter? -> 4 - 4 - 4: (4 - 4) - 4 vs 4 - (4 - 4)
+mul = mul * int | mul / int | int
+int = [0-9]+
+
+Problem: recursive.
+Solution: finally we have to exit sum layer -> mul + mul - mul + mul ...
+Therefore: while loop on muls: (((mul + mul) - mul) + mul) ...
+Recursion would be: mul + (mul - (mul + (mul ... )))
+
+String -> Tokens -> Expression.
+
+Virtual destructors + override keywoards.
+*/

@@ -4,7 +4,7 @@ We could abstract away and say every binary function is the same in essence and 
 
 left expression
 right expression
-function pointer (or std::function<bool(bool, bool)>)
+function pointer (or std::function<bool(bool, bool)>, or a template Op)
 get_symbol() function (for printing [left symbol right])
 
 However if we use function pointers then we will call these functions.

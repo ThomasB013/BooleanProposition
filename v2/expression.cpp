@@ -157,34 +157,34 @@ namespace Expression::Test {
     }
 
     bool test_eq() {
-        return Fabric::eq(Fabric::f(), Fabric::f())->eval({})   //0 0 1
-            && !Fabric::eq(Fabric::f(), Fabric::t())->eval({})  //0 1 0
-            && !Fabric::eq(Fabric::t(), Fabric::f())->eval({})  //1 0 0
-            && Fabric::eq(Fabric::t(), Fabric::t())->eval({});  //1 1 1
+        return Fabric::eq(Fabric::f(), Fabric::f())->eval()   //0 0 1
+            && !Fabric::eq(Fabric::f(), Fabric::t())->eval()  //0 1 0
+            && !Fabric::eq(Fabric::t(), Fabric::f())->eval()  //1 0 0
+            && Fabric::eq(Fabric::t(), Fabric::t())->eval();  //1 1 1
     }
 
     bool test_imp(){
-        return Fabric::imp(Fabric::f(), Fabric::f())->eval({})   //0 0 1
-            && Fabric::imp(Fabric::f(), Fabric::t())->eval({})   //0 1 1
-            && !Fabric::imp(Fabric::t(), Fabric::f())->eval({})  //1 0 0
-            && Fabric::imp(Fabric::t(), Fabric::t())->eval({});  //1 1 1
+        return Fabric::imp(Fabric::f(), Fabric::f())->eval()   //0 0 1
+            && Fabric::imp(Fabric::f(), Fabric::t())->eval()   //0 1 1
+            && !Fabric::imp(Fabric::t(), Fabric::f())->eval()  //1 0 0
+            && Fabric::imp(Fabric::t(), Fabric::t())->eval();  //1 1 1
     }
 
     bool test_dis(){
-        return !Fabric::dis(Fabric::f(), Fabric::f())->eval({}) //0 0 0
-            && Fabric::dis(Fabric::f(), Fabric::t())->eval({})  //0 1 1
-            && Fabric::dis(Fabric::t(), Fabric::f())->eval({})  //1 0 1
-            && Fabric::dis(Fabric::t(), Fabric::t())->eval({}); //1 1 1
+        return !Fabric::dis(Fabric::f(), Fabric::f())->eval() //0 0 0
+            && Fabric::dis(Fabric::f(), Fabric::t())->eval()  //0 1 1
+            && Fabric::dis(Fabric::t(), Fabric::f())->eval()  //1 0 1
+            && Fabric::dis(Fabric::t(), Fabric::t())->eval(); //1 1 1
     }
 
     bool test_con(){
-        return !Fabric::con(Fabric::f(), Fabric::f())->eval({}) //0 0 0
-            && !Fabric::con(Fabric::f(), Fabric::t())->eval({}) //0 1 0
-            && !Fabric::con(Fabric::t(), Fabric::f())->eval({}) //1 0 0
-            && Fabric::con(Fabric::t(), Fabric::t())->eval({}); //1 1 1
+        return !Fabric::con(Fabric::f(), Fabric::f())->eval() //0 0 0
+            && !Fabric::con(Fabric::f(), Fabric::t())->eval() //0 1 0
+            && !Fabric::con(Fabric::t(), Fabric::f())->eval() //1 0 0
+            && Fabric::con(Fabric::t(), Fabric::t())->eval(); //1 1 1
     }
     bool test_neg(){
-        return Fabric::neg(Fabric::f())->eval({}) && !Fabric::neg(Fabric::t())->eval({});
+        return Fabric::neg(Fabric::f())->eval() && !Fabric::neg(Fabric::t())->eval();
     }
     
     bool test_var(){
@@ -193,6 +193,6 @@ namespace Expression::Test {
     }
     
     bool test_const(){
-        return !Fabric::f()->eval({}) && Fabric::t()->eval({});
+        return !Fabric::f()->eval() && Fabric::t()->eval();
     }
 }

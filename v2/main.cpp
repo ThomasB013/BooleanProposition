@@ -3,16 +3,35 @@
 #include "parse.h"
 using namespace std;
 
-int main() {
-	Parse::Test::test();
-	for (string s; getline(cin, s); ) {
-		cout << Tokenize::Token_Stream{s} << '\n';	
+istream& get_cmd_line(istream& in, string& to, ostream& out=cout){
+	out << '>';
+	in >> to;
+	return in;
+}
+
+bool is_quit(const string& str) {
+	return str == "quit" || str == "exit" || str == "exit()";
+}
+
+//First execute tests from parsing, then execute some interactively.
+void test_parsing(istream& in=cin, ostream& out=cout) {
+	if (Parse::Test::test() && Expression::Test::test_all())
+		out << "Standard tests passed.\n";
+
+	for (string s; get_cmd_line(cin, s) && !is_quit(s); cout << '\n') {
 		try {
-			cout << "Parsed as: " << Parse::Proposition{s} << '\n';
+			const auto tokens = Tokenize::Token_Stream{s};	
+			const auto proposition = Parse::Proposition{s};
+			out << "Tokens: " << tokens << '\n';
+			out << "Parsed to: " << proposition << '\n';
 		}
 		catch (runtime_error& e) {
-			cout << e.what() << '\n';
+			out << e.what() << '\n';
 		}
 	}
+}
+
+int main() {
+	test_parsing();
 	return 0;
 }

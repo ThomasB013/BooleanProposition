@@ -20,12 +20,14 @@ Expression::Disjunction::Disjunction(std::unique_ptr<Expression> l, std::unique_
 
 Expression::Conjunction::Conjunction(std::unique_ptr<Expression> l, std::unique_ptr<Expression> r) :Bin_Exp{std::move(l), std::move(r)} {}
 
-void Expression::Bin_Exp::print(std::ostream& os) const {
-    os << '(';
-    left->print(os);
+void Expression::Bin_Exp::print(bool brackets, std::ostream& os) const {
+    if (brackets)
+        os << '(';
+    left->print(true, os);
     os << this->get_symbol();
-    right->print(os);
-    os << ')';
+    right->print(true, os);
+    if (brackets)
+        os << ')';
 }
 
 std::string Expression::Equivalence::get_symbol() const {
@@ -70,9 +72,9 @@ Expression::Un_Exp::Un_Exp(std::unique_ptr<Expression> e) :exp{std::move(e)} {}
 
 Expression::Negation::Negation(std::unique_ptr<Expression> e) : Un_Exp{std::move(e)} {}
 
-void Expression::Negation::print(std::ostream& os) const {
+void Expression::Negation::print(bool, std::ostream& os) const {
     os << Tokenize::NEG_SYM;
-    exp->print(os);
+    exp->print(true, os);
 }
 
 bool Expression::Negation::eval(const Env& env) const {
@@ -83,7 +85,7 @@ bool Expression::Negation::eval(const Env& env) const {
     CONSTANTS;
 */
 
-void Expression::Variable::print(std::ostream& os) const {
+void Expression::Variable::print(bool, std::ostream& os) const {
     os << name;
 }
 
@@ -91,13 +93,17 @@ bool Expression::Variable::eval(const Env& env) const {
     return env.at(name);
 }
 
-void Expression::Constant::print(std::ostream& os) const {
+void Expression::Constant::print(bool, std::ostream& os) const {
     os << (val ? Tokenize::TRUE_SYM : Tokenize::FALSE_SYM);
 }
 
 bool Expression::Constant::eval(const Env&) const {
     return val;
 }
+
+/*
+    FABRIC FUNCTIONS.
+*/
 
 namespace Expression::Fabric{
     std::unique_ptr<Equivalence> eq(std::unique_ptr<Expression> l, std::unique_ptr<Expression> r) { 

@@ -23,7 +23,7 @@ namespace Parse {
 
     //Test parsing by comparing printed (which includes brackets) vs expected bracket placements.
     namespace Test {
-        void test_parser(const std::string& input, const std::string& expect);
-        void test();
+        bool test_parser(const std::string& input, const std::string& expect);
+        bool test();
     }
 }

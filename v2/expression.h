@@ -18,12 +18,13 @@ namespace Expression {
 
     struct Expression {
         virtual bool eval(const Env&) const =0;
-        virtual void print(std::ostream& os=std::cout) const =0;
+        virtual void print(bool brackets, std::ostream& os=std::cout) const =0;
+        virtual ~Expression() {}
     };
 
     struct Bin_Exp : Expression {
         Bin_Exp(std::unique_ptr<Expression> l, std::unique_ptr<Expression> r);
-        void print(std::ostream& os=std::cout) const override;
+        void print(bool brackets, std::ostream& os=std::cout) const override;
         virtual std::string get_symbol() const =0;
         std::unique_ptr<Expression> left;
         std::unique_ptr<Expression> right;
@@ -65,20 +66,20 @@ namespace Expression {
 
     struct Negation final : Un_Exp {
         Negation( std::unique_ptr<Expression> e);
-        void print(std::ostream& os=std::cout) const override;
+        void print(bool, std::ostream& os=std::cout) const override;
         bool eval(const Env&) const override;
     };
 
     struct Variable final : Expression {
         Variable(const Var_type& n) :name{n} {}
-        void print(std::ostream& os=std::cout) const override;
+        void print(bool, std::ostream& os=std::cout) const override;
         bool eval(const Env&) const override;
         Var_type name;
     };
 
     struct Constant final : Expression {
         Constant(bool b=false) :val{b} {}
-        void print(std::ostream& os=std::cout) const override;
+        void print(bool, std::ostream& os=std::cout) const override;
         bool eval(const Env&) const override;
         bool val;
     };

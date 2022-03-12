@@ -122,7 +122,7 @@ Tokenize::Token::Token(Kind k, bool b) :kind{k}, value{b} {}
 Tokenize::Token::Token(Kind k, std::string n) :kind{k}, name{n} {}
 
 std::ostream& Tokenize::operator<<(std::ostream& os, const Token& t) {
-    os << "Token{";
+    os << "{"; //Token{";
     switch(t.kind){
     case Kind::EQ: //Fall through
     case Kind::IMP:
@@ -172,7 +172,7 @@ Tokenize::Token Tokenize::Token_Stream::consume() {
 namespace Tokenize {
     std::ostream& operator<<(std::ostream& os, const Token_Stream& ts) {
         for (const auto& token : ts.tokens)
-            os << token << '\n';
+            os << token;
         return os;
     }
 }

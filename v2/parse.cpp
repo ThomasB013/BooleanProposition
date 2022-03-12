@@ -86,25 +86,39 @@ bool Parse::Proposition::eval(const Expression::Env& env) const {
 
 namespace Parse {
     std::ostream& operator<<(std::ostream& os, const Proposition& p) {
-        p.exp->print(os);
+        p.exp->print(false, os);
         return os;
     }
 }
 
-void Parse::Test::test_parser(const std::string& input, const std::string& expect) {
+bool Parse::Test::test_parser(const std::string& input, const std::string& expect) {
     std::stringstream ss;
     Proposition p {input};
     ss << p;
-    if(ss.str() != expect)
+    if(ss.str() != expect) {
         std::cout << "Input: " << input 
             << "\nExpected: " << expect 
             << "\nActual: " << ss.str() << '\n';
+        return false;
+    }
+    return true;
 }
 
-void Parse::Test::test() {
-    test_parser("F", "F");
-    test_parser("_AAA_Z'", "_AAA_Z'");
-    test_parser("A/\\B", "(A/\\B)");
-    test_parser("A/\\B/\\C\\/D", "((A/\\(B/\\C))\\/D)");
-    test_parser("A->A<->B->C->D", "((A->A)<->(B->(C->D)))");
+bool Parse::Test::test() {
+    return test_parser("   A<->B   <->C", "(A<->B)<->C")    //<equivalence>       ::= <implication>   | <equivalence> <-> <implication>
+        && test_parser("A->B  -> C", "A->(B->C)")           //<implication>       ::= <disjunction>   | <disjunction> -> <implication>
+        && test_parser("A\\/B  \\/C", "A\\/(B\\/C)")        //<disjunction>       ::= <conjunction>   | <conjunction> \/ <disjunction>
+        && test_parser("   A/\\B    /\\C", "A/\\(B/\\C)")   //<conjunction>       ::= <negation>      | <negation> /\ <conjunction>
+        && test_parser("~~A    ", "~~A")                    //<negation>          ::= <value>         | ~ <negation>
+        && test_parser("(  (  (  A ))   )", "A")            //<value>             ::= <ident>         | ( <formula> )
+        && test_parser("_abcdefghijklmnopqrstuvwxyz'ABCDEFGHIJKLMNOPQRSTUVWXYZ_012345679         ", "_abcdefghijklmnopqrstuvwxyz'ABCDEFGHIJKLMNOPQRSTUVWXYZ_012345679")
+        && test_parser("A->B<->C->D", "(A->B)<->(C->D)")
+        && test_parser("A\\/B->C\\/D", "(A\\/B)->(C\\/D)")
+        && test_parser("A/\\B\\/C/\\D", "(A/\\B)\\/(C/\\D)")
+        && test_parser("~A/\\~B", "~A/\\~B")
+        && test_parser("((~(((A))/\\((B)))))", "~(A/\\B)")
+        && test_parser("A->B\\/C", "A->(B\\/C)")
+        && test_parser("(A->B)\\/C", "(A->B)\\/C")
+        && test_parser("A/\\B/\\C\\/D", "(A/\\(B/\\C))\\/D")
+        && test_parser("A->A<->B->C->D", "(A->A)<->(B->(C->D))");
 }

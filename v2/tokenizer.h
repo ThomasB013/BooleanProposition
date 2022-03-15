@@ -18,8 +18,10 @@ namespace Tokenize {
     enum class Kind {EQ, IMP, CON, DIS, NEG, BR_OPEN, BR_CLOSE, VAL, VAR, END};
 
     struct Token {
-        Token(Kind k, bool b=false);
-        Token(Kind k, std::string n);
+        Token(Kind k, bool b, std::string n);
+        Token(Kind k); //Implicit value = false, name = "".
+        Token(bool b); //Implicit kind = VAL, name ="";
+        Token(std::string n); //Implicit kind = VAR, value = false;
         Kind kind;
         bool value;
         std::string name;

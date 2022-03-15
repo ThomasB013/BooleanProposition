@@ -93,11 +93,11 @@ namespace {
         
         std::string name = extract_name(input, i);        
         if (name == true_sym)
-            tokens.push_back(Tokenize::Token{Tokenize::Kind::VAL, true});
+            tokens.push_back(Tokenize::Token{true});
         else if (name == false_sym)
-            tokens.push_back(Tokenize::Token{Tokenize::Kind::VAL, false});
+            tokens.push_back(Tokenize::Token{false});
         else
-            tokens.push_back(Tokenize::Token{Tokenize::Kind::VAR, name});
+            tokens.push_back(Tokenize::Token{name});
         return true;
     }
 
@@ -117,9 +117,13 @@ namespace {
 }
 
 //Namespace::Struct::Method
-Tokenize::Token::Token(Kind k, bool b) :kind{k}, value{b} {}
+Tokenize::Token::Token(Kind k, bool b, std::string n) :kind{k}, value{b}, name{n} {}
 
-Tokenize::Token::Token(Kind k, std::string n) :kind{k}, name{n} {}
+Tokenize::Token::Token(Kind k) :Token{k, false, ""} {}
+
+Tokenize::Token::Token(bool b) :Token{Kind::VAL, b, ""} {}
+
+Tokenize::Token::Token(std::string n) :Token{Kind::VAR, false, n} {}
 
 std::ostream& Tokenize::operator<<(std::ostream& os, const Token& t) {
     os << "{"; //Token{";
@@ -161,7 +165,7 @@ Tokenize::Token Tokenize::Token_Stream::get() const {
 }
 
 Tokenize::Token Tokenize::Token_Stream::consume() {
-    if (tokens.front().kind == Kind::END) 
+    if (get().kind == Kind::END) 
         throw std::runtime_error {"Token_Stream::consume(): cannot consume ending token."};
     Token t = tokens.front();
     tokens.pop_front();

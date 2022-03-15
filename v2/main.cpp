@@ -4,7 +4,7 @@
 using namespace std;
 
 istream& get_cmd_line(istream& in, string& to, ostream& out=cout){
-	out << '>';
+	out << '$';
 	in >> to;
 	return in;
 }

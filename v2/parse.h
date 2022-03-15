@@ -11,7 +11,8 @@ namespace Parse {
 
         //Constructs a Proposition by parsing the input string. May throw a runtime exception.
         explicit Proposition(const std::string&);
-        
+        explicit Proposition(const char*); //Fixes bug: const char* goes to bool by operator bool() rather than to std::string by constructor.
+
         //Evaluates the Proposition based on an (empty) environment.
         bool eval(const Expression::Env& env ={}) const;
         
@@ -23,7 +24,7 @@ namespace Parse {
 
     //Test parsing by comparing printed (which includes brackets) vs expected bracket placements.
     namespace Test {
-        bool test_parser(const std::string& input, const std::string& expect);
-        bool test();
+        bool test_parser_eval();
+        bool test_parser();
     }
 }

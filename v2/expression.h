@@ -13,8 +13,6 @@ This allows to use std::unique_ptr<Expression>.
 namespace Expression {
     using Var_type = std::string;
     using Env = std::map<Var_type, bool>;
-    //According to grammar.md, this can also be used for the ordering.
-    enum Kind { eq=0, imp, dis, con, neg, val}; 
 
     struct Expression {
         virtual bool eval(const Env& =Env{}) const =0;
@@ -61,7 +59,7 @@ namespace Expression {
 
     struct Un_Exp : Expression {
         Un_Exp(std::unique_ptr<Expression> e);
-         std::unique_ptr<Expression> exp;
+        std::unique_ptr<Expression> exp;
     };
 
     struct Negation final : Un_Exp {

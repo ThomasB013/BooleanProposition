@@ -5,7 +5,7 @@ using namespace std;
 
 istream& get_cmd_line(istream& in, string& to, ostream& out=cout){
 	out << '$';
-	in >> to;
+	getline(in, to);
 	return in;
 }
 
@@ -15,8 +15,10 @@ bool is_quit(const string& str) {
 
 //First execute tests from parsing, then execute some interactively.
 void test_parsing(istream& in=cin, ostream& out=cout) {
-	if (Parse::Test::test() && Expression::Test::test_all())
+	if (Expression::Test::test_all() && Parse::Test::test_parser_eval() && Parse::Test::test_parser())
 		out << "Standard tests passed.\n";
+	else
+		out << "Standard tests failed.\n";
 
 	for (string s; get_cmd_line(cin, s) && !is_quit(s); cout << '\n') {
 		try {
@@ -33,5 +35,6 @@ void test_parsing(istream& in=cin, ostream& out=cout) {
 
 int main() {
 	test_parsing();
+	
 	return 0;
 }

@@ -74,11 +74,87 @@ namespace {
         return p_eq(ts, false);
     }
 
+    //Test helper functions:
+    bool test_parser(const std::string& input, const std::string& expect) {
+        std::stringstream ss;
+        Parse::Proposition p {input};
+        ss << p;
+        if(ss.str() != expect) {
+            std::cout << "Input: " << input 
+                << "\nExpected: " << expect 
+                << "\nActual: " << ss.str() << '\n';
+            return false;
+        }
+        return true;
+    }
+
+     //Places OP between the truth table and checks against expected booleans
+    bool test_parse_operator(const std::string OP, bool EXP_FF, bool EXP_FT, bool EXP_TF, bool EXP_TT) {
+        return Parse::Proposition(Tokenize::FALSE_SYM + OP + Tokenize::FALSE_SYM).eval() == EXP_FF
+            && Parse::Proposition(Tokenize::FALSE_SYM + OP + Tokenize::TRUE_SYM).eval() == EXP_FT
+            && Parse::Proposition(Tokenize::TRUE_SYM + OP + Tokenize::FALSE_SYM).eval() == EXP_TF
+            && Parse::Proposition(Tokenize::TRUE_SYM + OP + Tokenize::TRUE_SYM).eval() == EXP_TT;
+    }
+
+    bool test_parse_eq() {
+        bool passed = test_parse_operator(Tokenize::EQ_SYM, true, false, false, true);
+        if (!passed)
+            std::cout << "test_parse_eq failed\n";
+        return passed;
+    }
+
+    bool test_parse_imp(){
+        bool passed = test_parse_operator(Tokenize::IMP_SYM, true, true, false, true);
+        if (!passed)
+            std::cout << "test_parse_imp failed\n";
+        return passed;
+    }
+
+    bool test_parse_dis(){
+        bool passed = test_parse_operator(Tokenize::DIS_SYM, false, true, true, true);
+        if (!passed)
+            std::cout << "test_parse_dis failed\n";
+        return passed;
+    }
+
+    bool test_parse_con(){
+        bool passed = test_parse_operator(Tokenize::CON_SYM, false, false, false, true);
+        if (!passed)
+            std::cout << "test_parse_con failed\n";
+        return passed;
+    
+    }
+
+    bool test_parse_neg(){
+        bool passed = Parse::Proposition(Tokenize::NEG_SYM + Tokenize::FALSE_SYM).eval() 
+            && !Parse::Proposition(Tokenize::NEG_SYM + Tokenize::TRUE_SYM).eval();
+        if (!passed)
+            std::cout << "test_parse_neg failed\n";
+        return passed;
+    }
+    
+    bool test_parse_var(){
+        const Expression::Env env {{"A", true}, {"B", false}};
+        bool passed = Parse::Proposition("A").eval(env) && !Parse::Proposition("B").eval(env);
+        if (!passed)
+            std::cout << "test_parse_var failed\n";
+        return passed;
+    }
+    
+    bool test_parse_const(){
+        bool passed = !Parse::Proposition("F").eval() && Parse::Proposition("T").eval();
+        if (!passed)
+            std::cout << "test_parse_const failed\n";
+        return passed;
+    }
+
 }
 
 Parse::Proposition::Proposition(bool b):exp{Expression::Fabric::cons(b)} {}
 
 Parse::Proposition::Proposition(const std::string& input) :exp{parse(input)} {}
+
+Parse::Proposition::Proposition(const char* input) :Proposition{std::string{input}} {}
 
 bool Parse::Proposition::eval(const Expression::Env& env) const {
     return exp->eval(env);
@@ -91,34 +167,31 @@ namespace Parse {
     }
 }
 
-bool Parse::Test::test_parser(const std::string& input, const std::string& expect) {
-    std::stringstream ss;
-    Proposition p {input};
-    ss << p;
-    if(ss.str() != expect) {
-        std::cout << "Input: " << input 
-            << "\nExpected: " << expect 
-            << "\nActual: " << ss.str() << '\n';
-        return false;
-    }
-    return true;
+bool Parse::Test::test_parser() {
+    return ::test_parser("   A<->B   <->C", "(A<->B)<->C")    //<equivalence>       ::= <implication>   | <equivalence> <-> <implication>
+        && ::test_parser("A->B  -> C", "A->(B->C)")           //<implication>       ::= <disjunction>   | <disjunction> -> <implication>
+        && ::test_parser("A\\/B  \\/C", "A\\/(B\\/C)")        //<disjunction>       ::= <conjunction>   | <conjunction> \/ <disjunction>
+        && ::test_parser("   A/\\B    /\\C", "A/\\(B/\\C)")   //<conjunction>       ::= <negation>      | <negation> /\ <conjunction>
+        && ::test_parser("~~A    ", "~~A")                    //<negation>          ::= <value>         | ~ <negation>
+        && ::test_parser("(  (  (  A ))   )", "A")            //<value>             ::= <ident>         | ( <formula> )
+        && ::test_parser("_abcdefghijklmnopqrstuvwxyz'ABCDEFGHIJKLMNOPQRSTUVWXYZ_012345679         ", "_abcdefghijklmnopqrstuvwxyz'ABCDEFGHIJKLMNOPQRSTUVWXYZ_012345679")
+        && ::test_parser("A->B<->C->D", "(A->B)<->(C->D)")
+        && ::test_parser("A\\/B->C\\/D", "(A\\/B)->(C\\/D)")
+        && ::test_parser("A/\\B\\/C/\\D", "(A/\\B)\\/(C/\\D)")
+        && ::test_parser("~A/\\~B", "~A/\\~B")
+        && ::test_parser("((~(((A))/\\((B)))))", "~(A/\\B)")
+        && ::test_parser("A->B\\/C", "A->(B\\/C)")
+        && ::test_parser("(A->B)\\/C", "(A->B)\\/C")
+        && ::test_parser("A/\\B/\\C\\/D", "(A/\\(B/\\C))\\/D")
+        && ::test_parser("A->A<->B->C->D", "(A->A)<->(B->(C->D))");
 }
 
-bool Parse::Test::test() {
-    return test_parser("   A<->B   <->C", "(A<->B)<->C")    //<equivalence>       ::= <implication>   | <equivalence> <-> <implication>
-        && test_parser("A->B  -> C", "A->(B->C)")           //<implication>       ::= <disjunction>   | <disjunction> -> <implication>
-        && test_parser("A\\/B  \\/C", "A\\/(B\\/C)")        //<disjunction>       ::= <conjunction>   | <conjunction> \/ <disjunction>
-        && test_parser("   A/\\B    /\\C", "A/\\(B/\\C)")   //<conjunction>       ::= <negation>      | <negation> /\ <conjunction>
-        && test_parser("~~A    ", "~~A")                    //<negation>          ::= <value>         | ~ <negation>
-        && test_parser("(  (  (  A ))   )", "A")            //<value>             ::= <ident>         | ( <formula> )
-        && test_parser("_abcdefghijklmnopqrstuvwxyz'ABCDEFGHIJKLMNOPQRSTUVWXYZ_012345679         ", "_abcdefghijklmnopqrstuvwxyz'ABCDEFGHIJKLMNOPQRSTUVWXYZ_012345679")
-        && test_parser("A->B<->C->D", "(A->B)<->(C->D)")
-        && test_parser("A\\/B->C\\/D", "(A\\/B)->(C\\/D)")
-        && test_parser("A/\\B\\/C/\\D", "(A/\\B)\\/(C/\\D)")
-        && test_parser("~A/\\~B", "~A/\\~B")
-        && test_parser("((~(((A))/\\((B)))))", "~(A/\\B)")
-        && test_parser("A->B\\/C", "A->(B\\/C)")
-        && test_parser("(A->B)\\/C", "(A->B)\\/C")
-        && test_parser("A/\\B/\\C\\/D", "(A/\\(B/\\C))\\/D")
-        && test_parser("A->A<->B->C->D", "(A->A)<->(B->(C->D))");
+bool Parse::Test::test_parser_eval(){
+    return ::test_parse_eq() 
+        && ::test_parse_imp() 
+        && ::test_parse_dis() 
+        && ::test_parse_con() 
+        && ::test_parse_neg() 
+        && ::test_parse_var() 
+        && ::test_parse_con();
 }

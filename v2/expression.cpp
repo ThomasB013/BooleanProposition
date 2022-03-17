@@ -1,26 +1,26 @@
 #include "expression.h"
 #include "tokenizer.h"
 
-const std::string Expression::Equivalence::SYMBOL {Tokenize::EQ_SYM};
-const std::string Expression::Implication::SYMBOL  {Tokenize::IMP_SYM};
-const std::string Expression::Disjunction::SYMBOL {Tokenize::DIS_SYM};
-const std::string Expression::Conjunction::SYMBOL {Tokenize::CON_SYM};
+const std::string expression::Equivalence::SYMBOL {tokenize::EQ_SYM};
+const std::string expression::Implication::SYMBOL {tokenize::IMP_SYM};
+const std::string expression::Disjunction::SYMBOL {tokenize::DIS_SYM};
+const std::string expression::Conjunction::SYMBOL {tokenize::CON_SYM};
 
 /*
     BINARY OPERATORS
 */
 
-Expression::Bin_Exp::Bin_Exp(std::unique_ptr<Expression> l, std::unique_ptr<Expression> r) :left{std::move(l)}, right{std::move(r)} {}
+expression::Bin_Exp::Bin_Exp(std::unique_ptr<Expression> l, std::unique_ptr<Expression> r) :left{std::move(l)}, right{std::move(r)} {}
 
-Expression::Equivalence::Equivalence(std::unique_ptr<Expression> l, std::unique_ptr<Expression> r) :Bin_Exp{std::move(l), std::move(r)} {}
+expression::Equivalence::Equivalence(std::unique_ptr<Expression> l, std::unique_ptr<Expression> r) :Bin_Exp{std::move(l), std::move(r)} {}
 
-Expression::Implication::Implication(std::unique_ptr<Expression> l, std::unique_ptr<Expression> r) :Bin_Exp{std::move(l), std::move(r)} {}
+expression::Implication::Implication(std::unique_ptr<Expression> l, std::unique_ptr<Expression> r) :Bin_Exp{std::move(l), std::move(r)} {}
 
-Expression::Disjunction::Disjunction(std::unique_ptr<Expression> l, std::unique_ptr<Expression> r) :Bin_Exp{std::move(l), std::move(r)} {}
+expression::Disjunction::Disjunction(std::unique_ptr<Expression> l, std::unique_ptr<Expression> r) :Bin_Exp{std::move(l), std::move(r)} {}
 
-Expression::Conjunction::Conjunction(std::unique_ptr<Expression> l, std::unique_ptr<Expression> r) :Bin_Exp{std::move(l), std::move(r)} {}
+expression::Conjunction::Conjunction(std::unique_ptr<Expression> l, std::unique_ptr<Expression> r) :Bin_Exp{std::move(l), std::move(r)} {}
 
-void Expression::Bin_Exp::print(bool brackets, std::ostream& os) const {
+void expression::Bin_Exp::print(bool brackets, std::ostream& os) const {
     if (brackets)
         os << '(';
     left->print(true, os);
@@ -30,37 +30,37 @@ void Expression::Bin_Exp::print(bool brackets, std::ostream& os) const {
         os << ')';
 }
 
-std::string Expression::Equivalence::get_symbol() const {
+std::string expression::Equivalence::get_symbol() const {
     return Equivalence::SYMBOL;
 }
 
-std::string Expression::Implication::get_symbol() const {
+std::string expression::Implication::get_symbol() const {
     return Implication::SYMBOL;
 }
 
-std::string Expression::Disjunction::get_symbol() const {
+std::string expression::Disjunction::get_symbol() const {
     return Disjunction::SYMBOL;
 }
 
-std::string Expression::Conjunction::get_symbol() const {
+std::string expression::Conjunction::get_symbol() const {
     return Conjunction::SYMBOL;
 }
 
-bool Expression::Equivalence::eval(const Env& env) const {
+bool expression::Equivalence::eval(const Env& env) const {
     const bool L = left->eval(env);
     const bool R = right->eval(env); //We need to compute both regardless, no short circuiting possible.
     return L && R || !L && !R;
 }
 
-bool Expression::Implication::eval(const Env& env) const {
+bool expression::Implication::eval(const Env& env) const {
     return !left->eval(env) || right->eval(env);
 }
 
-bool Expression::Disjunction::eval(const Env& env) const {
+bool expression::Disjunction::eval(const Env& env) const {
     return left->eval(env) || right->eval(env);
 }
 
-bool Expression::Conjunction::eval(const Env& env) const {
+bool expression::Conjunction::eval(const Env& env) const {
     return left->eval(env) && right->eval(env);
 }
 
@@ -68,16 +68,16 @@ bool Expression::Conjunction::eval(const Env& env) const {
     UNARY OPERATORS
 */
 
-Expression::Un_Exp::Un_Exp(std::unique_ptr<Expression> e) :exp{std::move(e)} {}
+expression::Un_Exp::Un_Exp(std::unique_ptr<Expression> e) :exp{std::move(e)} {}
 
-Expression::Negation::Negation(std::unique_ptr<Expression> e) : Un_Exp{std::move(e)} {}
+expression::Negation::Negation(std::unique_ptr<Expression> e) : Un_Exp{std::move(e)} {}
 
-void Expression::Negation::print(bool, std::ostream& os) const {
-    os << Tokenize::NEG_SYM;
+void expression::Negation::print(bool, std::ostream& os) const {
+    os << tokenize::NEG_SYM;
     exp->print(true, os);
 }
 
-bool Expression::Negation::eval(const Env& env) const {
+bool expression::Negation::eval(const Env& env) const {
     return !exp->eval(env);
 }
 
@@ -85,19 +85,19 @@ bool Expression::Negation::eval(const Env& env) const {
     CONSTANTS;
 */
 
-void Expression::Variable::print(bool, std::ostream& os) const {
+void expression::Variable::print(bool, std::ostream& os) const {
     os << name;
 }
 
-bool Expression::Variable::eval(const Env& env) const {
+bool expression::Variable::eval(const Env& env) const {
     return env.at(name);
 }
 
-void Expression::Constant::print(bool, std::ostream& os) const {
-    os << (val ? Tokenize::TRUE_SYM : Tokenize::FALSE_SYM);
+void expression::Constant::print(bool, std::ostream& os) const {
+    os << (val ? tokenize::TRUE_SYM : tokenize::FALSE_SYM);
 }
 
-bool Expression::Constant::eval(const Env&) const {
+bool expression::Constant::eval(const Env&) const {
     return val;
 }
 
@@ -105,7 +105,7 @@ bool Expression::Constant::eval(const Env&) const {
     FABRIC FUNCTIONS.
 */
 
-namespace Expression::Fabric{
+namespace expression::fabric{
     std::unique_ptr<Equivalence> eq(std::unique_ptr<Expression> l, std::unique_ptr<Expression> r) { 
         return std::make_unique<Equivalence>(std::move(l), std::move(r));
     }
@@ -143,11 +143,11 @@ namespace Expression::Fabric{
     }
 }
 
-namespace Expression::Test {
+namespace expression::test {
     /*
     Question: is it safe to "use namespace Fabric" here?
-    Fear: no, because other user might include Expression::Test, and it will automatically include Fabric?
-    Observation 1: functions from Expression::Fabric are not available in main.cpp after including Expression::Test.
+    Fear: no, because other user might include expression::Test, and it will automatically include Fabric?
+    Observation 1: functions from expression::Fabric are not available in main.cpp after including expression::Test.
     Observation 2: When the using declaration is placed inside the .h file, these functions are available.
     Conclusion: It is best to stay away from such subtle techniques, regardless of the answer.
                 I will treat it as unsafe. 
@@ -157,42 +157,42 @@ namespace Expression::Test {
     }
 
     bool test_eq() {
-        return Fabric::eq(Fabric::f(), Fabric::f())->eval()   //0 0 1
-            && !Fabric::eq(Fabric::f(), Fabric::t())->eval()  //0 1 0
-            && !Fabric::eq(Fabric::t(), Fabric::f())->eval()  //1 0 0
-            && Fabric::eq(Fabric::t(), Fabric::t())->eval();  //1 1 1
+        return fabric::eq(fabric::f(), fabric::f())->eval()   //0 0 1
+            && !fabric::eq(fabric::f(), fabric::t())->eval()  //0 1 0
+            && !fabric::eq(fabric::t(), fabric::f())->eval()  //1 0 0
+            && fabric::eq(fabric::t(), fabric::t())->eval();  //1 1 1
     }
 
     bool test_imp(){
-        return Fabric::imp(Fabric::f(), Fabric::f())->eval()   //0 0 1
-            && Fabric::imp(Fabric::f(), Fabric::t())->eval()   //0 1 1
-            && !Fabric::imp(Fabric::t(), Fabric::f())->eval()  //1 0 0
-            && Fabric::imp(Fabric::t(), Fabric::t())->eval();  //1 1 1
+        return fabric::imp(fabric::f(), fabric::f())->eval()   //0 0 1
+            && fabric::imp(fabric::f(), fabric::t())->eval()   //0 1 1
+            && !fabric::imp(fabric::t(), fabric::f())->eval()  //1 0 0
+            && fabric::imp(fabric::t(), fabric::t())->eval();  //1 1 1
     }
 
     bool test_dis(){
-        return !Fabric::dis(Fabric::f(), Fabric::f())->eval() //0 0 0
-            && Fabric::dis(Fabric::f(), Fabric::t())->eval()  //0 1 1
-            && Fabric::dis(Fabric::t(), Fabric::f())->eval()  //1 0 1
-            && Fabric::dis(Fabric::t(), Fabric::t())->eval(); //1 1 1
+        return !fabric::dis(fabric::f(), fabric::f())->eval() //0 0 0
+            && fabric::dis(fabric::f(), fabric::t())->eval()  //0 1 1
+            && fabric::dis(fabric::t(), fabric::f())->eval()  //1 0 1
+            && fabric::dis(fabric::t(), fabric::t())->eval(); //1 1 1
     }
 
     bool test_con(){
-        return !Fabric::con(Fabric::f(), Fabric::f())->eval() //0 0 0
-            && !Fabric::con(Fabric::f(), Fabric::t())->eval() //0 1 0
-            && !Fabric::con(Fabric::t(), Fabric::f())->eval() //1 0 0
-            && Fabric::con(Fabric::t(), Fabric::t())->eval(); //1 1 1
+        return !fabric::con(fabric::f(), fabric::f())->eval() //0 0 0
+            && !fabric::con(fabric::f(), fabric::t())->eval() //0 1 0
+            && !fabric::con(fabric::t(), fabric::f())->eval() //1 0 0
+            && fabric::con(fabric::t(), fabric::t())->eval(); //1 1 1
     }
     bool test_neg(){
-        return Fabric::neg(Fabric::f())->eval() && !Fabric::neg(Fabric::t())->eval();
+        return fabric::neg(fabric::f())->eval() && !fabric::neg(fabric::t())->eval();
     }
     
     bool test_var(){
         Env env {{"A", true}, {"B", false}};
-        return Fabric::var("A")->eval(env) && !Fabric::var("B")->eval(env);
+        return fabric::var("A")->eval(env) && !fabric::var("B")->eval(env);
     }
     
     bool test_const(){
-        return !Fabric::f()->eval() && Fabric::t()->eval();
+        return !fabric::f()->eval() && fabric::t()->eval();
     }
 }

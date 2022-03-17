@@ -10,7 +10,7 @@ We use memory to avoid memory leaks.
 This allows to use std::unique_ptr<Expression>.
 */
 
-namespace Expression {
+namespace expression {
     using Var_type = std::string;
     using Env = std::map<Var_type, bool>;
 
@@ -83,7 +83,7 @@ namespace Expression {
     };
 
     //Fabric contains helper functions.
-    namespace Fabric {
+    namespace fabric {
         std::unique_ptr<Equivalence> eq(std::unique_ptr<Expression> l, std::unique_ptr<Expression> r);
         std::unique_ptr<Implication> imp(std::unique_ptr<Expression> l, std::unique_ptr<Expression> r);
         std::unique_ptr<Disjunction> dis(std::unique_ptr<Expression> l, std::unique_ptr<Expression> r); 
@@ -97,7 +97,7 @@ namespace Expression {
 
     //Test implementation against truth tables.
     //For this the Fabric functions are used and the eval() member function of Expression.
-    namespace Test {
+    namespace test {
         bool test_all();
         bool test_eq();
         bool test_imp();

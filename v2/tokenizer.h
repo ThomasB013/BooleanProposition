@@ -4,7 +4,7 @@
 #include <list>
 #include <iostream>
 
-namespace Tokenize {
+namespace tokenize {
     const std::string EQ_SYM = "<->",
         IMP_SYM = "->",
         CON_SYM = "/\\",

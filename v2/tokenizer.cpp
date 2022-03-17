@@ -20,14 +20,14 @@ namespace {
             ++i;
     }
 
-    const std::pair<std::string, Tokenize::Kind> operators[]{
-        {Tokenize::EQ_SYM, Tokenize::Kind::EQ},
-        {Tokenize::IMP_SYM, Tokenize::Kind::IMP},
-        {Tokenize::CON_SYM, Tokenize::Kind::CON},
-        {Tokenize::DIS_SYM, Tokenize::Kind::DIS},
-        {Tokenize::NEG_SYM, Tokenize::Kind::NEG},
-        {Tokenize::BR_OPEN, Tokenize::Kind::BR_OPEN},
-        {Tokenize::BR_CLOSE, Tokenize::Kind::BR_CLOSE}
+    const std::pair<std::string, tokenize::Kind> operators[]{
+        {tokenize::EQ_SYM, tokenize::Kind::EQ},
+        {tokenize::IMP_SYM, tokenize::Kind::IMP},
+        {tokenize::CON_SYM, tokenize::Kind::CON},
+        {tokenize::DIS_SYM, tokenize::Kind::DIS},
+        {tokenize::NEG_SYM, tokenize::Kind::NEG},
+        {tokenize::BR_OPEN, tokenize::Kind::BR_OPEN},
+        {tokenize::BR_CLOSE, tokenize::Kind::BR_CLOSE}
     };
 
     /*
@@ -43,10 +43,10 @@ namespace {
     2.1 The inputs tokens and i remain unchanged.
     2.2 false is returned.
     */ 
-    bool matches_operator(const std::string& input, size_t& i, std::list<Tokenize::Token>& tokens) {
+    bool matches_operator(const std::string& input, size_t& i, std::list<tokenize::Token>& tokens) {
         for(const auto& p : operators){
             if (input.substr(i, p.first.length()) == p.first){
-                tokens.push_back(Tokenize::Token{p.second});
+                tokens.push_back(tokenize::Token{p.second});
                 i += p.first.length();
                 return true;
             }
@@ -87,17 +87,17 @@ namespace {
     2.5. i points to the position after N in the string input.
     2.6. true is returned.
     */
-    bool extract_variable(const std::string& input, size_t& i, std::list<Tokenize::Token>& tokens, const std::string& true_sym, const std::string& false_sym) {
+    bool extract_variable(const std::string& input, size_t& i, std::list<tokenize::Token>& tokens, const std::string& true_sym, const std::string& false_sym) {
         if (i == input.size() || !valid_first_char(input[i]))
             return false;
         
         std::string name = extract_name(input, i);        
         if (name == true_sym)
-            tokens.push_back(Tokenize::Token{true});
+            tokens.push_back(tokenize::Token{true});
         else if (name == false_sym)
-            tokens.push_back(Tokenize::Token{false});
+            tokens.push_back(tokenize::Token{false});
         else
-            tokens.push_back(Tokenize::Token{name});
+            tokens.push_back(tokenize::Token{name});
         return true;
     }
 
@@ -105,8 +105,8 @@ namespace {
     A list of tokens representing the input string is returned, see grammar.md.
     A runtime_error is thrown when parsing fails.
     */ 
-    std::list<Tokenize::Token> to_tokens(const std::string& input, const std::string& true_sym, const std::string& false_sym) {
-        std::list<Tokenize::Token> tokens;
+    std::list<tokenize::Token> to_tokens(const std::string& input, const std::string& true_sym, const std::string& false_sym) {
+        std::list<tokenize::Token> tokens;
         size_t i = 0;
         consume_space(input, i);
         for (; i != input.size(); consume_space(input, i))
@@ -117,15 +117,15 @@ namespace {
 }
 
 //Namespace::Struct::Method
-Tokenize::Token::Token(Kind k, bool b, std::string n) :kind{k}, value{b}, name{n} {}
+tokenize::Token::Token(Kind k, bool b, std::string n) :kind{k}, value{b}, name{n} {}
 
-Tokenize::Token::Token(Kind k) :Token{k, false, ""} {}
+tokenize::Token::Token(Kind k) :Token{k, false, ""} {}
 
-Tokenize::Token::Token(bool b) :Token{Kind::VAL, b, ""} {}
+tokenize::Token::Token(bool b) :Token{Kind::VAL, b, ""} {}
 
-Tokenize::Token::Token(std::string n) :Token{Kind::VAR, false, n} {}
+tokenize::Token::Token(std::string n) :Token{Kind::VAR, false, n} {}
 
-std::ostream& Tokenize::operator<<(std::ostream& os, const Token& t) {
+std::ostream& tokenize::operator<<(std::ostream& os, const Token& t) {
     os << "{"; //Token{";
     switch(t.kind){
     case Kind::EQ: //Fall through
@@ -149,7 +149,7 @@ std::ostream& Tokenize::operator<<(std::ostream& os, const Token& t) {
     return os;
 }
 
-Tokenize::Token_Stream::Token_Stream(const std::string& input) 
+tokenize::Token_Stream::Token_Stream(const std::string& input) 
     :tokens{to_tokens(input, TRUE_SYM, FALSE_SYM)} {
     /*
     Invariant:
@@ -160,11 +160,11 @@ Tokenize::Token_Stream::Token_Stream(const std::string& input)
     tokens.push_back(Token{Kind::END});
 }
 
-Tokenize::Token Tokenize::Token_Stream::get() const {
+tokenize::Token tokenize::Token_Stream::get() const {
     return tokens.front();
 }
 
-Tokenize::Token Tokenize::Token_Stream::consume() {
+tokenize::Token tokenize::Token_Stream::consume() {
     if (get().kind == Kind::END) 
         throw std::runtime_error {"Token_Stream::consume(): cannot consume ending token."};
     Token t = tokens.front();
@@ -173,7 +173,7 @@ Tokenize::Token Tokenize::Token_Stream::consume() {
 }
 
 
-namespace Tokenize {
+namespace tokenize {
     std::ostream& operator<<(std::ostream& os, const Token_Stream& ts) {
         for (const auto& token : ts.tokens)
             os << token;
@@ -183,14 +183,14 @@ namespace Tokenize {
 
 /*
 Why does the above work, but does:
-std::ostream& Tokenize::operator<<(std::ostream& os, const Token_Stream& ts) {
+std::ostream& tokenize::operator<<(std::ostream& os, const Token_Stream& ts) {
     for (const auto& token : ts.tokens)
         os << token << '\n';
     return os;
 }
 Give me the following warnings:
-warning: ‘std::ostream& Tokenize::operator<<(std::ostream&, const Tokenize::Token_Stream&)’ has not been declared within ‘Tokenize’
-  171 | std::ostream& Tokenize::operator<<(std::ostream& os, const Token_Stream& ts) {
+warning: ‘std::ostream& tokenize::operator<<(std::ostream&, const tokenize::Token_Stream&)’ has not been declared within ‘Tokenize’
+  171 | std::ostream& tokenize::operator<<(std::ostream& os, const Token_Stream& ts) {
 
 note: only here as a ‘friend’
    47 |         friend std::ostream& operator<<(std::ostream&, const Token_Stream&);

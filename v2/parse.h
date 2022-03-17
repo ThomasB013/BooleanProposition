@@ -2,7 +2,7 @@
 #include "expression.h"
 
 
-namespace Parse {
+namespace parse {
 
     class Proposition {
     public:
@@ -14,16 +14,16 @@ namespace Parse {
         explicit Proposition(const char*); //Fixes bug: const char* goes to bool by operator bool() rather than to std::string by constructor.
 
         //Evaluates the Proposition based on an (empty) environment.
-        bool eval(const Expression::Env& env ={}) const;
+        bool eval(const expression::Env& env ={}) const;
         
         //Function to output a proposition. Will always do brackets.
         friend std::ostream& operator<<(std::ostream&, const Proposition&);
     private:
-        std::unique_ptr<Expression::Expression> exp;
+        std::unique_ptr<expression::Expression> exp;
     };
 
     //Test parsing by comparing printed (which includes brackets) vs expected bracket placements.
-    namespace Test {
+    namespace test {
         bool test_parser_eval();
         bool test_parser();
     }
